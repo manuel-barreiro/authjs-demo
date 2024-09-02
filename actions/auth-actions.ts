@@ -2,7 +2,7 @@
 
 import { signIn } from "@/auth";
 import { loginSchema, registerSchema } from "@/lib/zod-schemas";
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import { AuthError } from "next-auth";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -15,11 +15,11 @@ export const loginAction = async (values: z.infer<typeof loginSchema>) => {
       redirect: false,
     });
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof AuthError) {
       return { error: error.cause?.err?.message };
     }
-    return { error: "Internal Server Error" };
+    return { error: error.message };
   }
 };
 
@@ -66,10 +66,10 @@ export const registerAction = async (
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof AuthError) {
       return { error: error.cause?.err?.message };
     }
-    return { error: "error desconocido" };
+    return { error: error.message };
   }
 };

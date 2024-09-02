@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import authConfig from "./auth.config";
 // Your own logic for dealing with plaintext password strings; be careful!
 // import { saltAndHashPassword } from "@/utils/password"
@@ -26,5 +26,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session;
     },
+  },
+  events: {
+    // El evento linkAccount se dispara cuando una cuenta (proveedor OAuth: GitHub, Google, Facebook, etc.)  se vincula a un usuario existente en tu base de datos.
+    async linkAccount({ user }) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: new Date(),
+        },
+      });
+    },
+  },
+  pages: {
+    signIn: "/login",
   },
 });

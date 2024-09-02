@@ -10,6 +10,8 @@ const apiAuthPrefix = "/api/auth";
 
 export default auth((req) => {
   const { nextUrl } = req;
+  const userRole = req.auth?.user.role;
+  console.log({ userRole });
   const isLoggedIn = !!req.auth;
 
   console.log({ isLoggedIn, path: nextUrl.pathname });
@@ -36,6 +38,11 @@ export default auth((req) => {
     !publicRoutes.includes(nextUrl.pathname)
   ) {
     return NextResponse.redirect(new URL("/login", nextUrl));
+  }
+
+  // Redirigir a /dashboard si el rol del usuario es user e intenta acceder a /admin
+  if (!userRole && nextUrl.pathname.startsWith("/admin")) {
+    return NextResponse.redirect(new URL("/dashboard", nextUrl));
   }
 
   return NextResponse.next();
